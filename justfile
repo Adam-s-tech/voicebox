@@ -150,26 +150,31 @@ setup-python:
         & "{{ python }}" -m pip --version *> $null; \
         return ($LASTEXITCODE -eq 0); \
     }; \
-    $py = $null; \
-    if (Get-Command py -ErrorAction SilentlyContinue) { \
-        $p = & py "-$target" -c "import sys; print(sys.executable)" 2>$null; \
-        if ($LASTEXITCODE -eq 0) { $py = $p }; \
-    }; \
-    if (-not $py) { foreach ($n in @("python$target", "python")) { \
-        $c = Get-Command $n -ErrorAction SilentlyContinue; \
-        if ($c -and (Test-Py $c.Source)) { $py = $c.Source; break }; \
-    } }; \
-    if (-not $py) { \
-        Write-Host "ERROR: Voicebox requires Python $target (see requires-python in backend/pyproject.toml)."; \
-        Write-Host "Install it from https://python.org or:  winget install -e --id Python.Python.$target"; \
-        Write-Host "Then re-run: just setup"; \
-        exit 1; \
-    }; \
     if ((Test-Path "{{ venv }}") -and (-not (Test-Py "{{ python }}") -or -not (Test-Pip))) { \
         Write-Host "Existing venv is not a working Python $target env - recreating..."; \
         Remove-Item -Recurse -Force "{{ venv }}"; \
     }; \
     if (-not (Test-Path "{{ venv }}")) { \
+        $py = $null; \
+        if (Get-Command py -ErrorAction SilentlyContinue) { \
+            $p = & py "-$target" -c "import sys; print(sys.executable)" 2>$null; \
+            if ($LASTEXITCODE -eq 0) { $py = $p }; \
+        }; \
+        if (-not $py) { foreach ($n in @("python$target", "python")) { \
+            $c = Get-Command $n -ErrorAction SilentlyContinue; \
+            if ($c -and (Test-Py $c.Source)) { $py = $c.Source; break }; \
+        } }; \
+        if (-not $py -and (Get-Command uv -ErrorAction SilentlyContinue)) { \
+            $p = & uv python find $target 2>$null; \
+            if ($LASTEXITCODE -eq 0 -and (Test-Py $p)) { $py = $p }; \
+        }; \
+        if (-not $py) { \
+            Write-Host "ERROR: Voicebox requires Python $target (see requires-python in backend/pyproject.toml)."; \
+            Write-Host "Install it from https://python.org, or:  winget install -e --id Python.Python.$target"; \
+            Write-Host "                                      or:  uv python install $target"; \
+            Write-Host "Then re-run: just setup"; \
+            exit 1; \
+        }; \
         Write-Host "Creating Python virtual environment with $py ..."; \
         & $py -m venv "{{ venv }}"; \
         if ($LASTEXITCODE -ne 0 -or -not (Test-Pip)) { Write-Host "ERROR: could not create a working venv with $py"; exit 1 }; \
