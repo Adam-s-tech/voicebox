@@ -19,10 +19,13 @@
   which the wrapper installed in the same release now catches at the source, so the guard no
   longer trips it. The per-file HEAD retries from
   [#434](https://github.com/jamiepine/voicebox/issues/434) were never covered by that wrapper.
-  Because a load now fails hard offline when any file is missing, every backend's cache check
-  lists the full set of files its load reads (Chatterbox tokenizer/conds, TADA's Llama
-  tokenizer mirror), so a partially downloaded snapshot reports "not cached" and downloads
-  online instead.
+  Because a load now fails hard offline when any file is missing, the Chatterbox, Chatterbox
+  Turbo, and TADA cache checks were extended to the small files their loaders also read
+  (tokenizer files, `conds.pt`, TADA's Llama tokenizer mirror) so a snapshot missing one of
+  them reports "not cached" and downloads online instead. The other engines still gate on
+  their weight files (plus `config.json` for Kokoro); transformers-based loaders fetch config
+  before weights, so a weights-present cache normally holds the rest, but that is an
+  assumption, not a check.
 
 ### Linux
 

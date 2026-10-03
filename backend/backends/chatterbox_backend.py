@@ -29,9 +29,10 @@ logger = logging.getLogger(__name__)
 
 CHATTERBOX_HF_REPO = "ResembleAI/chatterbox"
 
-# Every file ChatterboxMultilingualTTS.from_pretrained() downloads (chatterbox-tts
-# 0.1.7, mtl_tts.py allow_patterns). The load runs with HF offline mode forced
-# when this reports cached, so a partial snapshot must not count as cached.
+# The files ChatterboxMultilingualTTS.from_pretrained() downloads, as of
+# chatterbox-tts 0.1.7 (mtl_tts.py allow_patterns). The load runs with HF
+# offline mode forced when this reports cached, so a partial snapshot must not
+# count as cached -- if upstream adds a file to that list, add it here too.
 _MTL_WEIGHT_FILES = [
     "t3_mtl23ls_v2.safetensors",
     "s3gen.pt",
