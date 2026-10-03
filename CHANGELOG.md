@@ -13,7 +13,16 @@
   model now forces offline mode for the duration of the load, so it skips the network HEAD
   request (and its 5-retry backoff) for every config file — `config.json`,
   `generation_config.json`, and the rest — instead of retrying each one in sequence before the
-  app becomes ready.
+  app becomes ready. This reinstates the load-time `force_offline_if_cached` guard that 0.4.5
+  ([#530](https://github.com/jamiepine/voicebox/pull/530)) removed: that removal was a hotfix
+  for the `_patch_mistral_regex` crash ([#526](https://github.com/jamiepine/voicebox/issues/526)),
+  which the wrapper installed in the same release now catches at the source, so the guard no
+  longer trips it. The per-file HEAD retries from
+  [#434](https://github.com/jamiepine/voicebox/issues/434) were never covered by that wrapper.
+  Because a load now fails hard offline when any file is missing, every backend's cache check
+  lists the full set of files its load reads (Chatterbox tokenizer/conds, TADA's Llama
+  tokenizer mirror), so a partially downloaded snapshot reports "not cached" and downloads
+  online instead.
 
 ### Linux
 

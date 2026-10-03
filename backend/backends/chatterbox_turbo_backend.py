@@ -29,11 +29,18 @@ logger = logging.getLogger(__name__)
 
 CHATTERBOX_TURBO_HF_REPO = "ResembleAI/chatterbox-turbo"
 
-# Files that must be present for the turbo model
+# Every file ChatterboxTurboTTS.from_local() reads (chatterbox-tts 0.1.7): the
+# three weight files, the GPT-2 tokenizer files AutoTokenizer needs, and the
+# built-in voice. The load runs with HF offline mode forced when this reports
+# cached, so a partial snapshot must not count as cached.
 _TURBO_WEIGHT_FILES = [
     "t3_turbo_v1.safetensors",
     "s3gen_meanflow.safetensors",
     "ve.safetensors",
+    "tokenizer_config.json",
+    "vocab.json",
+    "merges.txt",
+    "conds.pt",
 ]
 
 
