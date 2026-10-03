@@ -26,6 +26,7 @@
 - **The 3.12 requirement is now machine-readable.** `backend/pyproject.toml`
   declares `requires-python = ">=3.12,<3.13"` rather than an open-ended `>=3.12`,
   so the constraint the docs describe is the one tooling resolves against.
+
 ### Linux
 
 - **ROCm setup works on Linux AMD systems.** Docker ROCm builds now keep PyTorch
