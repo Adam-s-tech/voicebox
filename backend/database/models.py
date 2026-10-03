@@ -253,7 +253,7 @@ class CloudSettings(Base):
     device_name = Column(String, nullable=True)
     account_user_id = Column(String, nullable=True)
     connected_at = Column(DateTime, nullable=True)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = Column(DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
 
 
 class MCPClientBinding(Base):
