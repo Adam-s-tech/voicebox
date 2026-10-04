@@ -27,6 +27,11 @@
   declares `requires-python = ">=3.12,<3.13"` rather than an open-ended `>=3.12`,
   so the constraint the docs describe is the one tooling resolves against.
 
+### Fixed
+
+- Voice generation requests that omit `engine` now honor the selected profile's
+  configured engine instead of silently defaulting to Qwen.
+
 ### Linux
 
 - **ROCm setup works on Linux AMD systems.** Docker ROCm builds now keep PyTorch
