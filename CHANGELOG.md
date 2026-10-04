@@ -7,6 +7,11 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Voice generation requests that omit `engine` now honor the selected profile's
+  configured engine instead of silently defaulting to Qwen.
+
 ### Reliability
 
 - **Cached models no longer retry HuggingFace when offline.** Loading a fully-downloaded
