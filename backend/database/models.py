@@ -54,7 +54,7 @@ class ProfileSample(Base):
     __tablename__ = "profile_samples"
 
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    profile_id = Column(String, ForeignKey("profiles.id"), nullable=False)
+    profile_id = Column(String, ForeignKey("profiles.id"), nullable=False, index=True)
     audio_path = Column(String, nullable=False)
     reference_text = Column(Text, nullable=False)
 
@@ -65,7 +65,7 @@ class Generation(Base):
     __tablename__ = "generations"
 
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    profile_id = Column(String, ForeignKey("profiles.id"), nullable=False)
+    profile_id = Column(String, ForeignKey("profiles.id"), nullable=False, index=True)
     text = Column(Text, nullable=False)
     language = Column(String, default="en")
     audio_path = Column(String, nullable=True)
@@ -74,7 +74,7 @@ class Generation(Base):
     instruct = Column(Text)
     engine = Column(String, default="qwen")
     model_size = Column(String, nullable=True)
-    status = Column(String, default="completed")
+    status = Column(String, default="completed", index=True)
     error = Column(Text, nullable=True)
     is_favorited = Column(Boolean, default=False)
     # Origin of this generation — "manual" for plain /generate calls,
@@ -82,7 +82,7 @@ class Generation(Base):
     # profile's personality LLM before TTS. Future sources (bulk import,
     # agent replies, etc.) can extend this.
     source = Column(String, nullable=False, default="manual")
-    created_at = Column(DateTime, default=lambda: datetime.now(UTC))
+    created_at = Column(DateTime, default=lambda: datetime.now(UTC), index=True)
 
 
 class Story(Base):
@@ -103,8 +103,8 @@ class StoryItem(Base):
     __tablename__ = "story_items"
 
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    story_id = Column(String, ForeignKey("stories.id"), nullable=False)
-    generation_id = Column(String, ForeignKey("generations.id"), nullable=False)
+    story_id = Column(String, ForeignKey("stories.id"), nullable=False, index=True)
+    generation_id = Column(String, ForeignKey("generations.id"), nullable=False, index=True)
     version_id = Column(String, ForeignKey("generation_versions.id"), nullable=True)
     start_time_ms = Column(Integer, nullable=False, default=0)
     track = Column(Integer, nullable=False, default=0)
@@ -132,7 +132,7 @@ class GenerationVersion(Base):
     __tablename__ = "generation_versions"
 
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    generation_id = Column(String, ForeignKey("generations.id"), nullable=False)
+    generation_id = Column(String, ForeignKey("generations.id"), nullable=False, index=True)
     label = Column(String, nullable=False)
     audio_path = Column(String, nullable=False)
     effects_chain = Column(Text, nullable=True)
@@ -172,7 +172,7 @@ class ChannelDeviceMapping(Base):
     __tablename__ = "channel_device_mappings"
 
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
-    channel_id = Column(String, ForeignKey("audio_channels.id"), nullable=False)
+    channel_id = Column(String, ForeignKey("audio_channels.id"), nullable=False, index=True)
     device_id = Column(String, nullable=False)
 
 
@@ -272,7 +272,7 @@ class MCPClientBinding(Base):
     label = Column(String, nullable=True)  # display name
     profile_id = Column(String, ForeignKey("profiles.id"), nullable=True)
     default_engine = Column(String, nullable=True)
-    # When true, voicebox.speak routes through the profile's personality LLM
+    # When true, voicebox_speak routes through the profile's personality LLM
     # (rewrite) before TTS by default. Callers can still override per call.
     default_personality = Column(Boolean, nullable=False, default=False)
     last_seen_at = Column(DateTime, nullable=True)
@@ -300,4 +300,4 @@ class Capture(Base):
     stt_model = Column(String, nullable=True)
     llm_model = Column(String, nullable=True)
     refinement_flags = Column(Text, nullable=True)  # JSON blob
-    created_at = Column(DateTime, default=lambda: datetime.now(UTC))
+    created_at = Column(DateTime, default=lambda: datetime.now(UTC), index=True)
