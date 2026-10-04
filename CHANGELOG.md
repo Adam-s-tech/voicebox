@@ -32,6 +32,26 @@
 - Voice generation requests that omit `engine` now honor the selected profile's
   configured engine instead of silently defaulting to Qwen.
 
+### Reliability
+
+- **Cached models no longer retry HuggingFace when offline.** Loading a fully-downloaded
+  model now forces offline mode for the duration of the load, so it skips the network HEAD
+  request (and its 5-retry backoff) for every config file — `config.json`,
+  `generation_config.json`, and the rest — instead of retrying each one in sequence before the
+  app becomes ready. This reinstates the load-time `force_offline_if_cached` guard that 0.4.5
+  ([#530](https://github.com/jamiepine/voicebox/pull/530)) removed: that removal was a hotfix
+  for the `_patch_mistral_regex` crash ([#526](https://github.com/jamiepine/voicebox/issues/526)),
+  which the wrapper installed in the same release now catches at the source, so the guard no
+  longer trips it. The per-file HEAD retries from
+  [#434](https://github.com/jamiepine/voicebox/issues/434) were never covered by that wrapper.
+  Because a load now fails hard offline when any file is missing, the Chatterbox, Chatterbox
+  Turbo, and TADA cache checks were extended to the small files their loaders also read
+  (tokenizer files, `conds.pt`, TADA's Llama tokenizer mirror) so a snapshot missing one of
+  them reports "not cached" and downloads online instead. The other engines still gate on
+  their weight files (plus `config.json` for Kokoro); transformers-based loaders fetch config
+  before weights, so a weights-present cache normally holds the rest, but that is an
+  assumption, not a check.
+
 ### Linux
 
 - **ROCm setup works on Linux AMD systems.** Docker ROCm builds now keep PyTorch
